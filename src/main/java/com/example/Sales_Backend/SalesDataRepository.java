@@ -1,14 +1,19 @@
 package com.example.Sales_Backend;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import jakarta.transaction.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
 
 @Repository
 public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
@@ -18,6 +23,9 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     @Query("SELECT AVG(sd.totRevLmtd) FROM SalesData sd")
     BigDecimal findTotalTotRevLmtdAll();
 
+    @Query("SELECT s FROM SalesData s WHERE s.id = :id")
+    SalesData findByIdOrNull(@Param("id") Long id);
+    
     @Query("SELECT AVG(sd.totRevMtd) FROM SalesData sd")
     BigDecimal findTotalTotRevMtdAll();  
     
@@ -251,6 +259,67 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     // Query to fetch distinct 'created_at' values
     @Query("SELECT DISTINCT sd.createdAt FROM SalesData sd ORDER BY sd.createdAt DESC")
     List<Date>findDistinctCreatedAt();
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE SalesData s SET s.siteName = :siteName, s.salesArea = :salesArea, s.area = :area, s.brand = :brand, "
+            + "s.totRevMtd = :totRevMtd, s.totRevLmtd = :totRevLmtd, s.totRevGrowth = :totRevGrowth, "
+            + "s.moboMtd = :moboMtd, s.moboLmtd = :moboLmtd, s.moboGrowth = :moboGrowth, "
+            + "s.orgRevMtd = :orgRevMtd, s.orgRevLmtd = :orgRevLmtd, s.orgRevGrowth = :orgRevGrowth, "
+            + "s.moboNonTradeMtd = :moboNonTradeMtd, s.moboNonTradeLmtd = :moboNonTradeLmtd, s.moboNonTradeGrowth = :moboNonTradeGrowth, "
+            + "s.moboTradeMtd = :moboTradeMtd, s.moboTradeLmtd = :moboTradeLmtd, s.moboTradeGrowth = :moboTradeGrowth, "
+            + "s.vasRevMtd = :vasRevMtd, s.vasRevLmtd = :vasRevLmtd, s.vasRevGrowth = :vasRevGrowth, "
+            + "s.dataRevMtd = :dataRevMtd, s.dataRevLmtd = :dataRevLmtd, s.dataRevGrowth = :dataRevGrowth, "
+            + "s.gaMtd = :gaMtd, s.gaLmtd = :gaLmtd, s.gaGrowth = :gaGrowth, "
+            + "s.m2sMtd = :m2sMtd, s.m2sLmtd = :m2sLmtd, s.m2sGrowth = :m2sGrowth, "
+            + "s.vlrMtd = :vlrMtd, s.vlrLmtd = :vlrLmtd, s.vlrGrowth = :vlrGrowth, "
+            + "s.vlrPrepaidMtd = :vlrPrepaidMtd, s.vlrPrepaidLmtd = :vlrPrepaidLmtd, s.vlrPrepaidGrowth = :vlrPrepaidGrowth, "
+            + "s.vlrPostpaidMtd = :vlrPostpaidMtd, s.vlrPostpaidLmtd = :vlrPostpaidLmtd, s.vlrPostpaidGrowth = :vlrPostpaidGrowth, "
+            + "s.rgu90Mtd = :rgu90Mtd, s.rgu90Lmtd = :rgu90Lmtd, s.rgu90Growth = :rgu90Growth, "
+            + "s.rgu30Mtd = :rgu30Mtd, s.rgu30Lmtd = :rgu30Lmtd, s.rgu30Growth = :rgu30Growth, "
+            + "s.netAdd90d = :netAdd90d, s.netAdd30d = :netAdd30d, "
+            + "s.dailyUroMtd = :dailyUroMtd, s.dailyUroLmtd = :dailyUroLmtd, s.dailyUroGrowth = :dailyUroGrowth, "
+            + "s.dailySsoMtd = :dailySsoMtd, s.dailySsoLmtd = :dailySsoLmtd, s.dailySsoGrowth = :dailySsoGrowth, "
+            + "s.tertiaryBMtd = :tertiaryBMtd, s.tertiaryBLmtd = :tertiaryBLmtd, s.tertiaryBGrowth = :tertiaryBGrowth, "
+            + "s.grossMtdChurn90d = :grossMtdChurn90d, s.grossMtdChurn30d = :grossMtdChurn30d, "
+            + "s.tradeSupplyMtd = :tradeSupplyMtd, s.tradeSupplyLmtd = :tradeSupplyLmtd, s.tradeSupplyGrowth = :tradeSupplyGrowth, "
+            + "s.acqRevMtd = :acqRevMtd, s.acqRevLmtd = :acqRevLmtd, s.acqRevGrowth = :acqRevGrowth, "
+            + "s.tradeCvmRevMtd = :tradeCvmRevMtd, s.tradeCvmRevLmtd = :tradeCvmRevLmtd, s.tradeCvmRevGrowth = :tradeCvmRevGrowth, "
+            + "s.tradeRebuyMtd = :tradeRebuyMtd, s.tradeRebuyLmtd = :tradeRebuyLmtd, s.tradeRebuyGrowth = :tradeRebuyGrowth, "
+            + "s.tradeSpMtd = :tradeSpMtd, s.tradeSpLmtd = :tradeSpLmtd, s.tradeSpGrowth = :tradeSpGrowth, "
+            + "s.quroMtd = :quroMtd, s.quroLmtd = :quroLmtd, s.quroGrowth = :quroGrowth, "
+            + "s.qssoMtd = :qssoMtd, s.qssoLmtd = :qssoLmtd, s.qssoGrowth = :qssoGrowth, "
+            + "s.createdAt = :createdAt WHERE s.id = :id")
+    void updateSalesData(Long id, String siteName, String salesArea, String area, String brand,
+                         BigDecimal totRevMtd, BigDecimal totRevLmtd, BigDecimal totRevGrowth,
+                         BigDecimal moboMtd, BigDecimal moboLmtd, BigDecimal moboGrowth,
+                         BigDecimal orgRevMtd, BigDecimal orgRevLmtd, BigDecimal orgRevGrowth,
+                         BigDecimal moboNonTradeMtd, BigDecimal moboNonTradeLmtd, BigDecimal moboNonTradeGrowth,
+                         BigDecimal moboTradeMtd, BigDecimal moboTradeLmtd, BigDecimal moboTradeGrowth,
+                         BigDecimal vasRevMtd, BigDecimal vasRevLmtd, BigDecimal vasRevGrowth,
+                         BigDecimal dataRevMtd, BigDecimal dataRevLmtd, BigDecimal dataRevGrowth,
+                         Long gaMtd, Long gaLmtd, BigDecimal gaGrowth,
+                         Long m2sMtd, Long m2sLmtd, BigDecimal m2sGrowth,
+                         BigDecimal vlrMtd, BigDecimal vlrLmtd, BigDecimal vlrGrowth,
+                         BigDecimal vlrPrepaidMtd, BigDecimal vlrPrepaidLmtd, BigDecimal vlrPrepaidGrowth,
+                         BigDecimal vlrPostpaidMtd, BigDecimal vlrPostpaidLmtd, BigDecimal vlrPostpaidGrowth,
+                         BigDecimal rgu90Mtd, BigDecimal rgu90Lmtd, BigDecimal rgu90Growth,
+                         BigDecimal rgu30Mtd, BigDecimal rgu30Lmtd, BigDecimal rgu30Growth,
+                         BigDecimal netAdd90d, BigDecimal netAdd30d,
+                         BigDecimal dailyUroMtd, BigDecimal dailyUroLmtd, BigDecimal dailyUroGrowth,
+                         BigDecimal dailySsoMtd, BigDecimal dailySsoLmtd, BigDecimal dailySsoGrowth,
+                         BigDecimal tertiaryBMtd, BigDecimal tertiaryBLmtd, BigDecimal tertiaryBGrowth,
+                         BigDecimal grossMtdChurn90d, BigDecimal grossMtdChurn30d,
+                         BigDecimal tradeSupplyMtd, BigDecimal tradeSupplyLmtd, BigDecimal tradeSupplyGrowth,
+                         BigDecimal acqRevMtd, BigDecimal acqRevLmtd, BigDecimal acqRevGrowth,
+                         BigDecimal tradeCvmRevMtd, BigDecimal tradeCvmRevLmtd, BigDecimal tradeCvmRevGrowth,
+                         BigDecimal tradeRebuyMtd, BigDecimal tradeRebuyLmtd, BigDecimal tradeRebuyGrowth,
+                         BigDecimal tradeSpMtd, BigDecimal tradeSpLmtd, BigDecimal tradeSpGrowth,
+                         BigDecimal quroMtd, BigDecimal quroLmtd, BigDecimal quroGrowth,
+                         BigDecimal qssoMtd, BigDecimal qssoLmtd, BigDecimal qssoGrowth,
+                         Date createdAt);
+    
+   
 
 
 //    SELECT 

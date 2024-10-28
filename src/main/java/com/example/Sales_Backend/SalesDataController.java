@@ -9,7 +9,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/salesdata")
-@CrossOrigin(origins = "http://localhost:3000") // Allow frontend to access this controller
+@CrossOrigin(origins = "*") // Allow frontend to access this controller
 public class SalesDataController {
 
     private final SalesDataService salesDataService;
@@ -204,11 +206,7 @@ public class SalesDataController {
    
     @GetMapping("/average")
     public List<SalesDataBranch> getAverageSalesDataAll(@RequestParam(value = "created_at", required = false) String createdAt) {
-        if (createdAt == null || createdAt.equals("null") || createdAt.isEmpty()) {
-           
-           return salesDataService.fetchSalesDataAll();
-        } else {
-           
+       
             try {
                 Date date = Date.valueOf(createdAt); 
            return salesDataService.fetchSalesData(date);
@@ -216,7 +214,7 @@ public class SalesDataController {
       
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd.");
             }
-        }
+        
     }
     
     @GetMapping("/lowest")
@@ -265,153 +263,286 @@ public class SalesDataController {
         List<SalesData> salesDataList = new ArrayList<>();
         SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy"); // Input format
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd"); // Output format for SQL Date
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             reader.readLine(); // Skip header line
-            
+
             while ((line = reader.readLine()) != null) {
                 String[] fields = line.split(",");
 
                 // Verify if the CSV has the expected number of fields
-                if (fields.length < 81) {
-                    return new ResponseEntity<>("CSV format is incorrect. Expected 80 fields per row.", HttpStatus.BAD_REQUEST);
+                if (fields.length < 82) {
+                    return new ResponseEntity<>("CSV format is incorrect. Expected 82 fields per row.", HttpStatus.BAD_REQUEST);
                 }
 
-                SalesData salesData = new SalesData();
-                // Adding the initial fields first
-                salesData.setSiteName(fields[0]);
-                salesData.setSalesArea(fields[1]);
-                salesData.setArea(fields[2]);
-                salesData.setBrand(fields[3]);
-                salesData.setTotRevMtd(new BigDecimal(fields[4]));
-                salesData.setTotRevLmtd(new BigDecimal(fields[5]));
-                salesData.setTotRevGrowth(new BigDecimal(fields[6]));
+                // Parse fields from CSV
+                Long id = Long.parseLong(fields[0].trim());
+                String siteName = fields[1].trim();
+                String salesArea = fields[2].trim();
+                String area = fields[3].trim();
+                String brand = fields[4].trim();
+                BigDecimal totRevMtd = new BigDecimal(fields[5].trim());
+                BigDecimal totRevLmtd = new BigDecimal(fields[6].trim());
+                BigDecimal totRevGrowth = new BigDecimal(fields[7].trim());
+                BigDecimal moboMtd = new BigDecimal(fields[8].trim());
+                BigDecimal moboLmtd = new BigDecimal(fields[9].trim());
+                BigDecimal moboGrowth = new BigDecimal(fields[10].trim());
+                BigDecimal orgRevMtd = new BigDecimal(fields[11].trim());
+                BigDecimal orgRevLmtd = new BigDecimal(fields[12].trim());
+                BigDecimal orgRevGrowth = new BigDecimal(fields[13].trim());
+                BigDecimal moboNonTradeMtd = new BigDecimal(fields[14].trim());
+                BigDecimal moboNonTradeLmtd = new BigDecimal(fields[15].trim());
+                BigDecimal moboNonTradeGrowth = new BigDecimal(fields[16].trim());
+                BigDecimal moboTradeMtd = new BigDecimal(fields[17].trim());
+                BigDecimal moboTradeLmtd = new BigDecimal(fields[18].trim());
+                BigDecimal moboTradeGrowth = new BigDecimal(fields[19].trim());
+                BigDecimal vasRevMtd = new BigDecimal(fields[20].trim());
+                BigDecimal vasRevLmtd = new BigDecimal(fields[21].trim());
+                BigDecimal vasRevGrowth = new BigDecimal(fields[22].trim());
+                BigDecimal dataRevMtd = new BigDecimal(fields[23].trim());
+                BigDecimal dataRevLmtd = new BigDecimal(fields[24].trim());
+                BigDecimal dataRevGrowth = new BigDecimal(fields[25].trim());
+                Long gaMtd = Long.parseLong(fields[26].trim());
+                Long gaLmtd = Long.parseLong(fields[27].trim());
+                BigDecimal gaGrowth = new BigDecimal(fields[28].trim());
+                Long m2sMtd = Long.parseLong(fields[29].trim());
+                Long m2sLmtd = Long.parseLong(fields[30].trim());
+                BigDecimal m2sGrowth = new BigDecimal(fields[31].trim());
+                BigDecimal vlrMtd = new BigDecimal(fields[32].trim());
+                BigDecimal vlrLmtd = new BigDecimal(fields[33].trim());
+                BigDecimal vlrGrowth = new BigDecimal(fields[34].trim());
+                BigDecimal vlrPrepaidMtd = new BigDecimal(fields[35].trim());
+                BigDecimal vlrPrepaidLmtd = new BigDecimal(fields[36].trim());
+                BigDecimal vlrPrepaidGrowth = new BigDecimal(fields[37].trim());
+                BigDecimal vlrPostpaidMtd = new BigDecimal(fields[38].trim());
+                BigDecimal vlrPostpaidLmtd = new BigDecimal(fields[39].trim());
+                BigDecimal vlrPostpaidGrowth = new BigDecimal(fields[40].trim());
+                BigDecimal rgu90Mtd = new BigDecimal(fields[41].trim());
+                BigDecimal rgu90Lmtd = new BigDecimal(fields[42].trim());
+                BigDecimal rgu90Growth = new BigDecimal(fields[43].trim());
+                BigDecimal rgu30Mtd = new BigDecimal(fields[44].trim());
+                BigDecimal rgu30Lmtd = new BigDecimal(fields[45].trim());
+                BigDecimal rgu30Growth = new BigDecimal(fields[46].trim());
+                BigDecimal netAdd90d = new BigDecimal(fields[47].trim());
+                BigDecimal netAdd30d = new BigDecimal(fields[48].trim());
+                BigDecimal dailyUroMtd = new BigDecimal(fields[49].trim());
+                BigDecimal dailyUroLmtd = new BigDecimal(fields[50].trim());
+                BigDecimal dailyUroGrowth = new BigDecimal(fields[51].trim());
+                BigDecimal dailySsoMtd = new BigDecimal(fields[52].trim());
+                BigDecimal dailySsoLmtd = new BigDecimal(fields[53].trim());
+                BigDecimal dailySsoGrowth = new BigDecimal(fields[54].trim());
+                BigDecimal tertiaryBMtd = new BigDecimal(fields[55].trim());
+                BigDecimal tertiaryBLmtd = new BigDecimal(fields[56].trim());
+                BigDecimal tertiaryBGrowth = new BigDecimal(fields[57].trim());
+                BigDecimal grossMtdChurn90d = new BigDecimal(fields[58].trim());
+                BigDecimal grossMtdChurn30d = new BigDecimal(fields[59].trim());
+                BigDecimal tradeSupplyMtd = new BigDecimal(fields[60].trim());
+                BigDecimal tradeSupplyLmtd = new BigDecimal(fields[61].trim());
+                BigDecimal tradeSupplyGrowth = new BigDecimal(fields[62].trim());
+                BigDecimal acqRevMtd = new BigDecimal(fields[63].trim());
+                BigDecimal acqRevLmtd = new BigDecimal(fields[64].trim());
+                BigDecimal acqRevGrowth = new BigDecimal(fields[65].trim());
+                BigDecimal tradeCvmRevMtd = new BigDecimal(fields[66].trim());
+                BigDecimal tradeCvmRevLmtd = new BigDecimal(fields[67].trim());
+                BigDecimal tradeCvmRevGrowth = new BigDecimal(fields[68].trim());
+                BigDecimal tradeRebuyMtd = new BigDecimal(fields[69].trim());
+                BigDecimal tradeRebuyLmtd = new BigDecimal(fields[70].trim());
+                BigDecimal tradeRebuyGrowth = new BigDecimal(fields[71].trim());
+                BigDecimal tradeSpMtd = new BigDecimal(fields[72].trim());
+                BigDecimal tradeSpLmtd = new BigDecimal(fields[73].trim());
+                BigDecimal tradeSpGrowth = new BigDecimal(fields[74].trim());
+                BigDecimal quroMtd = new BigDecimal(fields[75].trim());
+                BigDecimal quroLmtd = new BigDecimal(fields[76].trim());
+                BigDecimal quroGrowth = new BigDecimal(fields[77].trim());
+                BigDecimal qssoMtd = new BigDecimal(fields[78].trim());
+                BigDecimal qssoLmtd = new BigDecimal(fields[79].trim());
+                BigDecimal qssoGrowth = new BigDecimal(fields[80].trim());
+                Date createdAt = Date.valueOf(fields[81].trim()); // Assuming date in YYYY-MM-DD format
 
-                // Continue with the remaining fields
-                salesData.setMoboMtd(new BigDecimal(fields[7]));
-                salesData.setMoboLmtd(new BigDecimal(fields[8]));
-                salesData.setMoboGrowth(new BigDecimal(fields[9]));
+                // Check if the SalesData already exists
+                SalesData existingData = salesDataRepository.findByIdOrNull(id);
+                if (existingData != null) {
+                    // Update existing data\
+                	existingData.setId(id);
+                    existingData.setSiteName(siteName);
+                    existingData.setSalesArea(salesArea);
+                    existingData.setArea(area);
+                    existingData.setBrand(brand);
+                    existingData.setTotRevMtd(totRevMtd);
+                    existingData.setTotRevLmtd(totRevLmtd);
+                    existingData.setTotRevGrowth(totRevGrowth);
+                    existingData.setMoboMtd(moboMtd);
+                    existingData.setMoboLmtd(moboLmtd);
+                    existingData.setMoboGrowth(moboGrowth);
+                    existingData.setOrgRevMtd(orgRevMtd);
+                    existingData.setOrgRevLmtd(orgRevLmtd);
+                    existingData.setOrgRevGrowth(orgRevGrowth);
+                    existingData.setMoboNonTradeMtd(moboNonTradeMtd);
+                    existingData.setMoboNonTradeLmtd(moboNonTradeLmtd);
+                    existingData.setMoboNonTradeGrowth(moboNonTradeGrowth);
+                    existingData.setMoboTradeMtd(moboTradeMtd);
+                    existingData.setMoboTradeLmtd(moboTradeLmtd);
+                    existingData.setMoboTradeGrowth(moboTradeGrowth);
+                    existingData.setVasRevMtd(vasRevMtd);
+                    existingData.setVasRevLmtd(vasRevLmtd);
+                    existingData.setVasRevGrowth(vasRevGrowth);
+                    existingData.setDataRevMtd(dataRevMtd);
+                    existingData.setDataRevLmtd(dataRevLmtd);
+                    existingData.setDataRevGrowth(dataRevGrowth);
+                    existingData.setGaMtd(gaMtd);
+                    existingData.setGaLmtd(gaLmtd);
+                    existingData.setGaGrowth(gaGrowth);
+                    existingData.setM2sMtd(m2sMtd);
+                    existingData.setM2sLmtd(m2sLmtd);
+                    existingData.setM2sGrowth(m2sGrowth);
+                    existingData.setVlrMtd(vlrMtd);
+                    existingData.setVlrLmtd(vlrLmtd);
+                    existingData.setVlrGrowth(vlrGrowth);
+                    existingData.setVlrPrepaidMtd(vlrPrepaidMtd);
+                    existingData.setVlrPrepaidLmtd(vlrPrepaidLmtd);
+                    existingData.setVlrPrepaidGrowth(vlrPrepaidGrowth);
+                    existingData.setVlrPostpaidMtd(vlrPostpaidMtd);
+                    existingData.setVlrPostpaidLmtd(vlrPostpaidLmtd);
+                    existingData.setVlrPostpaidGrowth(vlrPostpaidGrowth);
+                    existingData.setRgu90Mtd(rgu90Mtd);
+                    existingData.setRgu90Lmtd(rgu90Lmtd);
+                    existingData.setRgu90Growth(rgu90Growth);
+                    existingData.setRgu30Mtd(rgu30Mtd);
+                    existingData.setRgu30Lmtd(rgu30Lmtd);
+                    existingData.setRgu30Growth(rgu30Growth);
+                    existingData.setNetAdd90d(netAdd90d);
+                    existingData.setNetAdd30d(netAdd30d);
+                    existingData.setDailyUroMtd(dailyUroMtd);
+                    existingData.setDailyUroLmtd(dailyUroLmtd);
+                    existingData.setDailyUroGrowth(dailyUroGrowth);
+                    existingData.setDailySsoMtd(dailySsoMtd);
+                    existingData.setDailySsoLmtd(dailySsoLmtd);
+                    existingData.setDailySsoGrowth(dailySsoGrowth);
+                    existingData.setTertiaryBMtd(tertiaryBMtd);
+                    existingData.setTertiaryBLmtd(tertiaryBLmtd);
+                    existingData.setTertiaryBGrowth(tertiaryBGrowth);
+                    existingData.setGrossMtdChurn90d(grossMtdChurn90d);
+                    existingData.setGrossMtdChurn30d(grossMtdChurn30d);
+                    existingData.setTradeSupplyMtd(tradeSupplyMtd);
+                    existingData.setTradeSupplyLmtd(tradeSupplyLmtd);
+                    existingData.setTradeSupplyGrowth(tradeSupplyGrowth);
+                    existingData.setAcqRevMtd(acqRevMtd);
+                    existingData.setAcqRevLmtd(acqRevLmtd);
+                    existingData.setAcqRevGrowth(acqRevGrowth);
+                    existingData.setTradeCvmRevMtd(tradeCvmRevMtd);
+                    existingData.setTradeCvmRevLmtd(tradeCvmRevLmtd);
+                    existingData.setTradeCvmRevGrowth(tradeCvmRevGrowth);
+                    existingData.setTradeRebuyMtd(tradeRebuyMtd);
+                    existingData.setTradeRebuyLmtd(tradeRebuyLmtd);
+                    existingData.setTradeRebuyGrowth(tradeRebuyGrowth);
+                    existingData.setTradeSpMtd(tradeSpMtd);
+                    existingData.setTradeSpLmtd(tradeSpLmtd);
+                    existingData.setTradeSpGrowth(tradeSpGrowth);
+                    existingData.setQuroMtd(quroMtd);
+                    existingData.setQuroLmtd(quroLmtd);
+                    existingData.setQuroGrowth(quroGrowth);
+                    existingData.setQssoMtd(qssoMtd);
+                    existingData.setQssoLmtd(qssoLmtd);
+                    existingData.setQssoGrowth(qssoGrowth);
+                    existingData.setCreatedAt(createdAt); // Update createdAt
+                    salesDataRepository.save(existingData); // Save updated data
+                } else {
+                    // Create a new SalesData object for new entries
+                    SalesData newSalesData = new SalesData();
+                    newSalesData.setId(id);
+                    newSalesData.setSiteName(siteName);
+                    newSalesData.setSalesArea(salesArea);
+                    newSalesData.setArea(area);
+                    newSalesData.setBrand(brand);
+                    newSalesData.setTotRevMtd(totRevMtd);
+                    newSalesData.setTotRevLmtd(totRevLmtd);
+                    newSalesData.setTotRevGrowth(totRevGrowth);
+                    newSalesData.setMoboMtd(moboMtd);
+                    newSalesData.setMoboLmtd(moboLmtd);
+                    newSalesData.setMoboGrowth(moboGrowth);
+                    newSalesData.setOrgRevMtd(orgRevMtd);
+                    newSalesData.setOrgRevLmtd(orgRevLmtd);
+                    newSalesData.setOrgRevGrowth(orgRevGrowth);
+                    newSalesData.setMoboNonTradeMtd(moboNonTradeMtd);
+                    newSalesData.setMoboNonTradeLmtd(moboNonTradeLmtd);
+                    newSalesData.setMoboNonTradeGrowth(moboNonTradeGrowth);
+                    newSalesData.setMoboTradeMtd(moboTradeMtd);
+                    newSalesData.setMoboTradeLmtd(moboTradeLmtd);
+                    newSalesData.setMoboTradeGrowth(moboTradeGrowth);
+                    newSalesData.setVasRevMtd(vasRevMtd);
+                    newSalesData.setVasRevLmtd(vasRevLmtd);
+                    newSalesData.setVasRevGrowth(vasRevGrowth);
+                    newSalesData.setDataRevMtd(dataRevMtd);
+                    newSalesData.setDataRevLmtd(dataRevLmtd);
+                    newSalesData.setDataRevGrowth(dataRevGrowth);
+                    newSalesData.setGaMtd(gaMtd);
+                    newSalesData.setGaLmtd(gaLmtd);
+                    newSalesData.setGaGrowth(gaGrowth);
+                    newSalesData.setM2sMtd(m2sMtd);
+                    newSalesData.setM2sLmtd(m2sLmtd);
+                    newSalesData.setM2sGrowth(m2sGrowth);
+                    newSalesData.setVlrMtd(vlrMtd);
+                    newSalesData.setVlrLmtd(vlrLmtd);
+                    newSalesData.setVlrGrowth(vlrGrowth);
+                    newSalesData.setVlrPrepaidMtd(vlrPrepaidMtd);
+                    newSalesData.setVlrPrepaidLmtd(vlrPrepaidLmtd);
+                    newSalesData.setVlrPrepaidGrowth(vlrPrepaidGrowth);
+                    newSalesData.setVlrPostpaidMtd(vlrPostpaidMtd);
+                    newSalesData.setVlrPostpaidLmtd(vlrPostpaidLmtd);
+                    newSalesData.setVlrPostpaidGrowth(vlrPostpaidGrowth);
+                    newSalesData.setRgu90Mtd(rgu90Mtd);
+                    newSalesData.setRgu90Lmtd(rgu90Lmtd);
+                    newSalesData.setRgu90Growth(rgu90Growth);
+                    newSalesData.setRgu30Mtd(rgu30Mtd);
+                    newSalesData.setRgu30Lmtd(rgu30Lmtd);
+                    newSalesData.setRgu30Growth(rgu30Growth);
+                    newSalesData.setNetAdd90d(netAdd90d);
+                    newSalesData.setNetAdd30d(netAdd30d);
+                    newSalesData.setDailyUroMtd(dailyUroMtd);
+                    newSalesData.setDailyUroLmtd(dailyUroLmtd);
+                    newSalesData.setDailyUroGrowth(dailyUroGrowth);
+                    newSalesData.setDailySsoMtd(dailySsoMtd);
+                    newSalesData.setDailySsoLmtd(dailySsoLmtd);
+                    newSalesData.setDailySsoGrowth(dailySsoGrowth);
+                    newSalesData.setTertiaryBMtd(tertiaryBMtd);
+                    newSalesData.setTertiaryBLmtd(tertiaryBLmtd);
+                    newSalesData.setTertiaryBGrowth(tertiaryBGrowth);
+                    newSalesData.setGrossMtdChurn90d(grossMtdChurn90d);
+                    newSalesData.setGrossMtdChurn30d(grossMtdChurn30d);
+                    newSalesData.setTradeSupplyMtd(tradeSupplyMtd);
+                    newSalesData.setTradeSupplyLmtd(tradeSupplyLmtd);
+                    newSalesData.setTradeSupplyGrowth(tradeSupplyGrowth);
+                    newSalesData.setAcqRevMtd(acqRevMtd);
+                    newSalesData.setAcqRevLmtd(acqRevLmtd);
+                    newSalesData.setAcqRevGrowth(acqRevGrowth);
+                    newSalesData.setTradeCvmRevMtd(tradeCvmRevMtd);
+                    newSalesData.setTradeCvmRevLmtd(tradeCvmRevLmtd);
+                    newSalesData.setTradeCvmRevGrowth(tradeCvmRevGrowth);
+                    newSalesData.setTradeRebuyMtd(tradeRebuyMtd);
+                    newSalesData.setTradeRebuyLmtd(tradeRebuyLmtd);
+                    newSalesData.setTradeRebuyGrowth(tradeRebuyGrowth);
+                    newSalesData.setTradeSpMtd(tradeSpMtd);
+                    newSalesData.setTradeSpLmtd(tradeSpLmtd);
+                    newSalesData.setTradeSpGrowth(tradeSpGrowth);
+                    newSalesData.setQuroMtd(quroMtd);
+                    newSalesData.setQuroLmtd(quroLmtd);
+                    newSalesData.setQuroGrowth(quroGrowth);
+                    newSalesData.setQssoMtd(qssoMtd);
+                    newSalesData.setQssoLmtd(qssoLmtd);
+                    newSalesData.setQssoGrowth(qssoGrowth);
+                    newSalesData.setCreatedAt(createdAt); // Set createdAt for new entries
 
-                salesData.setOrgRevMtd(new BigDecimal(fields[10]));
-                salesData.setOrgRevLmtd(new BigDecimal(fields[11]));
-                salesData.setOrgRevGrowth(new BigDecimal(fields[12]));
-
-                salesData.setMoboNonTradeMtd(new BigDecimal(fields[13]));
-                salesData.setMoboNonTradeLmtd(new BigDecimal(fields[14]));
-                salesData.setMoboNonTradeGrowth(new BigDecimal(fields[15]));
-
-                salesData.setMoboTradeMtd(new BigDecimal(fields[16]));
-                salesData.setMoboTradeLmtd(new BigDecimal(fields[17]));
-                salesData.setMoboTradeGrowth(new BigDecimal(fields[18]));
-
-                salesData.setVasRevMtd(new BigDecimal(fields[19]));
-                salesData.setVasRevLmtd(new BigDecimal(fields[20]));
-                salesData.setVasRevGrowth(new BigDecimal(fields[21]));
-
-                salesData.setDataRevMtd(new BigDecimal(fields[22]));
-                salesData.setDataRevLmtd(new BigDecimal(fields[23]));
-                salesData.setDataRevGrowth(new BigDecimal(fields[24]));
-
-                salesData.setGaMtd(Long.parseLong(fields[25]));
-                salesData.setGaLmtd(Long.parseLong(fields[26]));
-                salesData.setGaGrowth(new BigDecimal(fields[27]));
-
-                salesData.setM2sMtd(Long.parseLong(fields[28]));
-                salesData.setM2sLmtd(Long.parseLong(fields[29]));
-                salesData.setM2sGrowth(new BigDecimal(fields[30]));
-
-                salesData.setVlrMtd(new BigDecimal(fields[31]));
-                salesData.setVlrLmtd(new BigDecimal(fields[32]));
-                salesData.setVlrGrowth(new BigDecimal(fields[33]));
-
-                salesData.setVlrPrepaidMtd(new BigDecimal(fields[34]));
-                salesData.setVlrPrepaidLmtd(new BigDecimal(fields[35]));
-                salesData.setVlrPrepaidGrowth(new BigDecimal(fields[36]));
-
-                salesData.setVlrPostpaidMtd(new BigDecimal(fields[37]));
-                salesData.setVlrPostpaidLmtd(new BigDecimal(fields[38]));
-                salesData.setVlrPostpaidGrowth(new BigDecimal(fields[39]));
-
-                salesData.setRgu90Mtd(new BigDecimal(fields[40]));
-                salesData.setRgu90Lmtd(new BigDecimal(fields[41]));
-                salesData.setRgu90Growth(new BigDecimal(fields[42]));
-
-                salesData.setRgu30Mtd(new BigDecimal(fields[43]));
-                salesData.setRgu30Lmtd(new BigDecimal(fields[44]));
-                salesData.setRgu30Growth(new BigDecimal(fields[45]));
-
-                salesData.setNetAdd90d(new BigDecimal(fields[46]));
-                salesData.setNetAdd30d(new BigDecimal(fields[47]));
-
-                salesData.setDailyUroMtd(new BigDecimal(fields[48]));
-                salesData.setDailyUroLmtd(new BigDecimal(fields[49]));
-                salesData.setDailyUroGrowth(new BigDecimal(fields[50]));
-
-                salesData.setDailySsoMtd(new BigDecimal(fields[51]));
-                salesData.setDailySsoLmtd(new BigDecimal(fields[52]));
-                salesData.setDailySsoGrowth(new BigDecimal(fields[53]));
-
-                salesData.setTertiaryBMtd(new BigDecimal(fields[54]));
-                salesData.setTertiaryBLmtd(new BigDecimal(fields[55]));
-                salesData.setTertiaryBGrowth(new BigDecimal(fields[56]));
-
-                salesData.setGrossMtdChurn90d(new BigDecimal(fields[57]));
-                salesData.setGrossMtdChurn30d(new BigDecimal(fields[58]));
-
-                salesData.setTradeSupplyMtd(new BigDecimal(fields[59]));
-                salesData.setTradeSupplyLmtd(new BigDecimal(fields[60]));
-                salesData.setTradeSupplyGrowth(new BigDecimal(fields[61]));
-
-                salesData.setAcqRevMtd(new BigDecimal(fields[62]));
-                salesData.setAcqRevLmtd(new BigDecimal(fields[63]));
-                salesData.setAcqRevGrowth(new BigDecimal(fields[64]));
-
-                salesData.setTradeCvmRevMtd(new BigDecimal(fields[65]));
-                salesData.setTradeCvmRevLmtd(new BigDecimal(fields[66]));
-                salesData.setTradeCvmRevGrowth(new BigDecimal(fields[67]));
-
-                salesData.setTradeRebuyMtd(new BigDecimal(fields[68]));
-                salesData.setTradeRebuyLmtd(new BigDecimal(fields[69]));
-                salesData.setTradeRebuyGrowth(new BigDecimal(fields[70]));
-
-                salesData.setTradeSpMtd(new BigDecimal(fields[71]));
-                salesData.setTradeSpLmtd(new BigDecimal(fields[72]));
-                salesData.setTradeSpGrowth(new BigDecimal(fields[73]));
-
-                salesData.setQuroMtd(new BigDecimal(fields[74]));
-                salesData.setQuroLmtd(new BigDecimal(fields[75]));
-                salesData.setQuroGrowth(new BigDecimal(fields[76]));
-
-                salesData.setQssoMtd(new BigDecimal(fields[77]));
-                salesData.setQssoLmtd(new BigDecimal(fields[78]));
-                salesData.setQssoGrowth(new BigDecimal(fields[79]));
-                String createdAtStr = fields[80].trim(); // Ensure there are no leading/trailing spaces
-
-                // Validate the date format
-                if (createdAtStr.isEmpty()) {
-                    return new ResponseEntity<>("Date for createdAt cannot be empty.", HttpStatus.BAD_REQUEST);
+                    salesDataRepository.save(newSalesData); // Save new data
                 }
-
-                try {
-                    // Parse the date from the input format and convert to SQL date
-                    java.util.Date parsedDate = inputFormat.parse(createdAtStr);
-                    salesData.setCreatedAt(new Date(parsedDate.getTime()));
-                } catch (ParseException e) {
-                    return new ResponseEntity<>("Invalid date format for createdAt: " + createdAtStr, HttpStatus.BAD_REQUEST);
-                }
-                salesDataList.add(salesData);
             }
-
-            // Save all data to database
-            salesDataRepository.saveAll(salesDataList);
-
         } catch (Exception e) {
-            // Log the error details for better debugging
             e.printStackTrace();
-            return new ResponseEntity<>("Failed to upload and save sales data. Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error processing file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>("Sales data uploaded and saved successfully.", HttpStatus.OK);
+        return new ResponseEntity<>("Upload successful!", HttpStatus.OK);
     }
+    
 
 }

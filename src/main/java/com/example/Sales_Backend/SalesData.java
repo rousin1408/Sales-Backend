@@ -14,7 +14,6 @@ import jakarta.persistence.Table;
 @Table(name = "sales_data")
 public class SalesData {
 	 	@Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY) // Untuk auto-increment
 	    private Long id;
 
 	    @Column(name = "site_name")

@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import java.time.format.DateTimeFormatter;
 
 @RestController
 @RequestMapping("/api/salesdata")
@@ -357,7 +358,23 @@ public class SalesDataController {
                 BigDecimal qssoMtd = new BigDecimal(fields[78].trim());
                 BigDecimal qssoLmtd = new BigDecimal(fields[79].trim());
                 BigDecimal qssoGrowth = new BigDecimal(fields[80].trim());
-                Date createdAt = Date.valueOf(fields[81].trim()); // Assuming date in YYYY-MM-DD format
+
+                String dateString = fields[81].trim();
+                Date createdAt = null;
+
+                // Check if dateString is in yyyy-MM-dd format
+                if (dateString.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                    createdAt = Date.valueOf(dateString);
+                } else {
+                    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("MM-dd-yyyy");
+                    LocalDate localDate = LocalDate.parse(dateString, inputFormatter);
+                    createdAt = Date.valueOf(localDate);
+                }
+
+                // Optionally, print the createdAt value
+                if (createdAt != null) {
+                    System.out.println("CreatedAt: " + createdAt);
+                }
 
                 // Check if the SalesData already exists
                 SalesData existingData = salesDataRepository.findByIdOrNull(id);

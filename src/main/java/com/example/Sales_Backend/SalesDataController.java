@@ -275,7 +275,6 @@ public class SalesDataController {
                 if (fields.length < 82) {
                     return new ResponseEntity<>("CSV format is incorrect. Expected 82 fields per row.", HttpStatus.BAD_REQUEST);
                 }
-
                 // Parse fields from CSV
                 Long id = Long.parseLong(fields[0].trim());
                 String siteName = fields[1].trim();

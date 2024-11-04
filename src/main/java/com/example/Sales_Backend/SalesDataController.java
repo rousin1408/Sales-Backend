@@ -261,7 +261,7 @@ public class SalesDataController {
     @PostMapping("/upload")
     public ResponseEntity<String> uploadSalesData(@RequestParam("file") MultipartFile file) {
         List<SalesData> salesDataList = new ArrayList<>();
-        SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy"); // Input format
+        SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy"); // Input format
         SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd"); // Output format for SQL Date
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {

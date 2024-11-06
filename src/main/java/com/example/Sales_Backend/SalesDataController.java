@@ -44,28 +44,29 @@ public class SalesDataController {
     
     // Caching the result to prevent frequent database hits
     @GetMapping("/TopColumn")
-    public SalesData getSalesDataTotals(@RequestParam(value = "created_at", required = false) String createdAt) {
+    public SalesData getSalesDataTotals(@RequestParam(value = "created_at", required = false) String createdAt,
+    		@RequestParam(value = "sales_area", required = false) String salesArea) {
     	SalesData totalSalesData = new SalesData();
         
-        if (createdAt == null || createdAt.equals("null") || createdAt.isEmpty()) {
-           
+    	 if (salesArea == null || salesArea.equals("null") || salesArea.isEmpty()) {
+    		 Date date = Date.valueOf(createdAt); 
             // Fetching all necessary data in one place to reduce multiple calls
-            totalSalesData.setTotRevLmtd(salesDataRepository.findTotalTotRevLmtdAll());
-            totalSalesData.setTotRevMtd(salesDataRepository.findTotalTotRevMtdAll());
-            totalSalesData.setTotRevGrowth(salesDataRepository.findTotalTotRevGrowthAll());
+             totalSalesData.setTotRevLmtd(salesDataRepository.findTotalTotRevLmtd(date));
+             totalSalesData.setTotRevMtd(salesDataRepository.findTotalTotRevMtd(date));
+             totalSalesData.setTotRevGrowth(salesDataRepository.findTotalTotRevGrowth(date));
 
-            totalSalesData.setVlrLmtd(salesDataRepository.findTotalVlrLmtdAll());
-            totalSalesData.setVlrMtd(salesDataRepository.findTotalVlrMtdAll());
-            totalSalesData.setVlrGrowth(salesDataRepository.findTotalVlrGrowthAll());
+            totalSalesData.setVlrLmtd(salesDataRepository.findTotalVlrLmtdAll(date));
+            totalSalesData.setVlrMtd(salesDataRepository.findTotalVlrMtdAll(date));
+            totalSalesData.setVlrGrowth(salesDataRepository.findTotalVlrGrowthAll(date));
 
-            totalSalesData.setRgu90Lmtd(salesDataRepository.findTotalrgu90LmtdAll());
-            totalSalesData.setRgu90Mtd(salesDataRepository.findTotalrgu90MtdAll());
-            totalSalesData.setRgu90Growth(salesDataRepository.findTotalrgu90GrowthAll());
+            totalSalesData.setRgu90Lmtd(salesDataRepository.findTotalrgu90LmtdAll(date));
+            totalSalesData.setRgu90Mtd(salesDataRepository.findTotalrgu90MtdAll(date));
+            totalSalesData.setRgu90Growth(salesDataRepository.findTotalrgu90GrowthAll(date));
 
-            totalSalesData.setNetAdd30d(salesDataRepository.findTotalnetAdd30dAll());
-            totalSalesData.setNetAdd90d(salesDataRepository.findTotalnetAdd90dAll());
-            totalSalesData.setGrossMtdChurn30d(salesDataRepository.findTotalgrossMtdChurn30dAll());
-            totalSalesData.setGrossMtdChurn90d(salesDataRepository.findTotalgrossMtdChurn90dAll());
+            totalSalesData.setNetAdd30d(salesDataRepository.findTotalnetAdd30d(date));
+            totalSalesData.setNetAdd90d(salesDataRepository.findTotalnetAdd90d(date));
+            totalSalesData.setGrossMtdChurn30d(salesDataRepository.findTotalgrossMtdChurn30d(date));
+            totalSalesData.setGrossMtdChurn90d(salesDataRepository.findTotalgrossMtdChurn90d(date));
         } else {
            
             try {
@@ -75,13 +76,13 @@ public class SalesDataController {
                 totalSalesData.setTotRevMtd(salesDataRepository.findTotalTotRevMtd(date));
                 totalSalesData.setTotRevGrowth(salesDataRepository.findTotalTotRevGrowth(date));
 
-                totalSalesData.setVlrLmtd(salesDataRepository.findTotalVlrLmtd(date));
-                totalSalesData.setVlrMtd(salesDataRepository.findTotalVlrMtd(date));
-                totalSalesData.setVlrGrowth(salesDataRepository.findTotalVlrGrowth(date));
+                totalSalesData.setVlrLmtd(salesDataRepository.findTotalVlrLmtd(date,salesArea));
+                totalSalesData.setVlrMtd(salesDataRepository.findTotalVlrMtd(date,salesArea));
+                totalSalesData.setVlrGrowth(salesDataRepository.findTotalVlrGrowth(date,salesArea));
 
-                totalSalesData.setRgu90Lmtd(salesDataRepository.findTotalrgu90Lmtd(date));
-                totalSalesData.setRgu90Mtd(salesDataRepository.findTotalrgu90Mtd(date));
-                totalSalesData.setRgu90Growth(salesDataRepository.findTotalrgu90Growth(date));
+                totalSalesData.setRgu90Lmtd(salesDataRepository.findTotalrgu90Lmtd(date,salesArea));
+                totalSalesData.setRgu90Mtd(salesDataRepository.findTotalrgu90Mtd(date,salesArea));
+                totalSalesData.setRgu90Growth(salesDataRepository.findTotalrgu90Growth(date,salesArea));
 
                 totalSalesData.setNetAdd30d(salesDataRepository.findTotalnetAdd30d(date));
                 totalSalesData.setNetAdd90d(salesDataRepository.findTotalnetAdd90d(date));
@@ -89,40 +90,47 @@ public class SalesDataController {
                 totalSalesData.setGrossMtdChurn90d(salesDataRepository.findTotalgrossMtdChurn90d(date));
             } catch (IllegalArgumentException e) {
       
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Data");
             }
         }
 
         return totalSalesData;
     }
 
+   
     // Caching to prevent unnecessary database hits
     @GetMapping("/SecondColumn")
-    public SalesData getSalesDataTotalsecond(@RequestParam(value = "created_at", required = false) String createdAt) {
+    public SalesData getSalesDataTotalsecond(@RequestParam(value = "created_at", required = false) String createdAt,
+    		@RequestParam(value = "sales_area", required = false) String salesArea) {
     	SalesData totalSalesData = new SalesData();
-        
-        if (createdAt == null || createdAt.equals("null") || createdAt.isEmpty()) {
-           
-        	totalSalesData.setTotRevMtd(salesDataRepository.findTotalTotRevMtdAll());
-            totalSalesData.setDailyUroGrowth(salesDataRepository.findTotaldailyUroGrowthAll());
-            totalSalesData.setDailySsoGrowth(salesDataRepository.findTotaldailySsoGrowthAll());
+    	
+    	 if (salesArea == null || salesArea.equals("null") || salesArea.isEmpty()) {
+    		 Date date = Date.valueOf(createdAt); 
+             totalSalesData.setTotRevMtd(salesDataRepository.findTotalTotRevMtd(date));
+             totalSalesData.setDailyUroGrowth(salesDataRepository.findTotaldailyUroGrowth(date));
+             totalSalesData.setDailySsoGrowth(salesDataRepository.findTotaldailySsoGrowth(date));
+            
+            
+            totalSalesData.setQuroLmtd(salesDataRepository.findTotalquroLmtdAll(date));            
+            totalSalesData.setQuroMtd(salesDataRepository.findTotalquroMtdAll(date));
+            totalSalesData.setQuroGrowth(salesDataRepository.findTotalquroGrowthAll(date));
+            totalSalesData.setQssoGrowth(salesDataRepository.findTotalqssoGrowthAll(date));
+            totalSalesData.setQssoMtd(salesDataRepository.findTotalqssoMtdAll(date));
+            totalSalesData.setQssoLmtd(salesDataRepository.findTotalqssoLmtdAll(date));
+            
+            
+            
+            totalSalesData.setMoboMtd(salesDataRepository.findTotalmoboMtd(date));
+            totalSalesData.setDataRevMtd(salesDataRepository.findTotaldataRevMtd(date));
+            totalSalesData.setVasRevMtd(salesDataRepository.findTotalvasRevMtd(date));
+            totalSalesData.setMoboTradeMtd(salesDataRepository.findTotalMoboTradeMtd(date));
+            totalSalesData.setMoboNonTradeMtd(salesDataRepository.findTotalMoboNonTradeMtd(date));
+            totalSalesData.setOrgRevMtd(salesDataRepository.findTotalorgRevMtd(date));
 
-            totalSalesData.setQuroMtd(salesDataRepository.findTotalquroMtdAll());
-            totalSalesData.setQuroGrowth(salesDataRepository.findTotalquroGrowthAll());
-            totalSalesData.setQssoGrowth(salesDataRepository.findTotalqssoGrowthAll());
-            totalSalesData.setQssoMtd(salesDataRepository.findTotalqssoMtdAll());
-            
-            totalSalesData.setMoboMtd(salesDataRepository.findTotalmoboMtdAll());
-            totalSalesData.setDataRevMtd(salesDataRepository.findTotaldataRevMtdAll());
-            totalSalesData.setVasRevMtd(salesDataRepository.findTotalvasRevMtdAll());
-            totalSalesData.setMoboTradeMtd(salesDataRepository.findTotalMoboTradeMtdAll());
-            totalSalesData.setMoboNonTradeMtd(salesDataRepository.findTotalMoboNonTradeMtdAll());
-            totalSalesData.setOrgRevMtd(salesDataRepository.findTotalorgRevMtdAll());
-            
-            totalSalesData.setTradeSupplyMtd(salesDataRepository.findTotalTradeSupplyMtdAll());
-            totalSalesData.setTradeCvmRevMtd(salesDataRepository.findTotalTradeCvmRevMtdAll());
-            totalSalesData.setTradeSpMtd(salesDataRepository.findTotalTradeSpMtdAll());
-            totalSalesData.setTradeRebuyMtd(salesDataRepository.findTotaltradeRebuyMtdAll());
+            totalSalesData.setTradeSupplyMtd(salesDataRepository.findTotalTradeSupplyMtd(date));
+            totalSalesData.setTradeCvmRevMtd(salesDataRepository.findTotalTradeCvmRevMtd(date));
+            totalSalesData.setTradeSpMtd(salesDataRepository.findTotalTradeSpMtd(date));
+            totalSalesData.setTradeRebuyMtd(salesDataRepository.findTotaltradeRebuyMtd(date));
         } else {
            
             try {
@@ -131,10 +139,13 @@ public class SalesDataController {
                 totalSalesData.setDailyUroGrowth(salesDataRepository.findTotaldailyUroGrowth(date));
                 totalSalesData.setDailySsoGrowth(salesDataRepository.findTotaldailySsoGrowth(date));
 
-                totalSalesData.setQuroMtd(salesDataRepository.findTotalquroMtd(date));
-                totalSalesData.setQuroGrowth(salesDataRepository.findTotalquroGrowth(date));
-                totalSalesData.setQssoGrowth(salesDataRepository.findTotalqssoGrowth(date));
-                totalSalesData.setQssoMtd(salesDataRepository.findTotalqssoMtd(date));
+                totalSalesData.setQuroLmtd(salesDataRepository.findTotalquroLmtd(date,salesArea));
+                totalSalesData.setQuroMtd(salesDataRepository.findTotalquroMtd(date,salesArea));
+                totalSalesData.setQuroGrowth(salesDataRepository.findTotalquroGrowth(date,salesArea));
+                totalSalesData.setQssoGrowth(salesDataRepository.findTotalqssoGrowth(date,salesArea));
+                totalSalesData.setQssoMtd(salesDataRepository.findTotalqssoMtd(date,salesArea));
+                totalSalesData.setQssoLmtd(salesDataRepository.findTotalqssoLmtd(date,salesArea));
+                
 
                 totalSalesData.setMoboMtd(salesDataRepository.findTotalmoboMtd(date));
                 totalSalesData.setDataRevMtd(salesDataRepository.findTotaldataRevMtd(date));
@@ -216,6 +227,10 @@ public class SalesDataController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd.");
             }
         
+    }
+    @GetMapping("/city")
+    public List<SalesDataBranch> getSalesDataAverage() {
+        return salesDataService.fetchSalesDataAll();
     }
     
     @GetMapping("/lowest")

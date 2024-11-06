@@ -26,6 +26,7 @@ public class SalesDataService {
     public List<SalesDataBranch> fetchSalesData(Date createdAt) {
         return salesDataRepository.getSalesData(createdAt);
     }
+    
     public List<SalesDataBranch> fetchLowestAll() {
         return salesDataRepository.getLowestAll();
     }

@@ -34,24 +34,32 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     
     
     
-    @Query("SELECT AVG(sd.vlrLmtd) FROM SalesData sd")
-    BigDecimal findTotalVlrLmtdAll();
+    
+    
+    @Query("SELECT AVG(sd.vlrLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalVlrLmtdAll(@Param("createdAt") Date createdAt);
 
-    @Query("SELECT AVG(sd.vlrMtd) FROM SalesData sd")
-    BigDecimal findTotalVlrMtdAll();
+    @Query("SELECT AVG(sd.vlrMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalVlrMtdAll(@Param("createdAt") Date createdAt);
     
-    @Query("SELECT AVG(sd.vlrGrowth)*100 FROM SalesData sd")
-    BigDecimal findTotalVlrGrowthAll();
+    @Query("SELECT AVG(sd.vlrGrowth)*100 FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalVlrGrowthAll(@Param("createdAt") Date createdAt);
     
     
-    @Query("SELECT AVG(sd.rgu90Mtd) FROM SalesData sd")
-    BigDecimal findTotalrgu90LmtdAll();
+    
+//    Tandai
+    @Query("SELECT AVG(sd.rgu90Mtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalrgu90LmtdAll(@Param("createdAt") Date createdAt);
 
-    @Query("SELECT AVG(sd.rgu90Lmtd) FROM SalesData sd")
-    BigDecimal findTotalrgu90MtdAll();
+    @Query("SELECT AVG(sd.rgu90Lmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalrgu90MtdAll(@Param("createdAt") Date createdAt);
     
-    @Query("SELECT AVG(sd.rgu90Growth)*100 FROM SalesData sd")
-    BigDecimal findTotalrgu90GrowthAll();
+    @Query("SELECT AVG(sd.rgu90Growth)*100 FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalrgu90GrowthAll(@Param("createdAt") Date createdAt);
+    
+    
+    
+    
     
     
     @Query("SELECT AVG(sd.netAdd90d) FROM SalesData sd")
@@ -79,23 +87,39 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     @Query("SELECT AVG(sd.totRevGrowth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt")
     BigDecimal findTotalTotRevGrowth(@Param("createdAt") Date createdAt);
 
-    @Query("SELECT AVG(sd.vlrLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalVlrLmtd(@Param("createdAt") Date createdAt);
+    
 
-    @Query("SELECT AVG(sd.vlrMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalVlrMtd(@Param("createdAt") Date createdAt);
+    
+    
+    
+    @Query("SELECT AVG(sd.vlrLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalVlrLmtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.vlrGrowth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalVlrGrowth(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.vlrMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalVlrMtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.rgu90Mtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalrgu90Lmtd(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.vlrGrowth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalVlrGrowth(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+    
+    
+    
+    
+    
 
-    @Query("SELECT AVG(sd.rgu90Lmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalrgu90Mtd(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.rgu90Mtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalrgu90Lmtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.rgu90Growth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalrgu90Growth(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.rgu90Lmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalrgu90Mtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+
+    @Query("SELECT AVG(sd.rgu90Growth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalrgu90Growth(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+    
+    
+    
+    
+    
+    
 
     @Query("SELECT AVG(sd.netAdd90d) FROM SalesData sd WHERE sd.createdAt = :createdAt")
     BigDecimal findTotalnetAdd90d(@Param("createdAt") Date createdAt);
@@ -108,25 +132,48 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
 
     @Query("SELECT AVG(sd.grossMtdChurn30d) FROM SalesData sd WHERE sd.createdAt = :createdAt")
     BigDecimal findTotalgrossMtdChurn30d(@Param("createdAt") Date createdAt);
+    
+    
+    
     //Second Column
+    
+    
     @Query("SELECT AVG(sd.dailyUroGrowth) FROM SalesData sd")
     BigDecimal findTotaldailyUroGrowthAll();
     
     @Query("SELECT AVG(sd.dailySsoGrowth) FROM SalesData sd")
     BigDecimal findTotaldailySsoGrowthAll();
+//    @Query("SELECT AVG(sd.rgu90Mtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+//    BigDecimal findTotalrgu90LmtdAll(@Param("createdAt") Date createdAt);
     
     
-    @Query("SELECT AVG(sd.quroGrowth) FROM SalesData sd")
-    BigDecimal findTotalquroGrowthAll();
     
-    @Query("SELECT AVG(sd.quroMtd) FROM SalesData sd")
-    BigDecimal findTotalquroMtdAll();
+    @Query("SELECT AVG(sd.quroGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalquroGrowthAll(@Param("createdAt") Date createdAt);
     
-    @Query("SELECT AVG(sd.qssoGrowth) FROM SalesData sd")
-    BigDecimal findTotalqssoGrowthAll();
+    @Query("SELECT AVG(sd.quroMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalquroMtdAll(@Param("createdAt") Date createdAt);
     
-    @Query("SELECT AVG(sd.qssoMtd) FROM SalesData sd")
-    BigDecimal findTotalqssoMtdAll();
+    @Query("SELECT AVG(sd.quroLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalquroLmtdAll(@Param("createdAt") Date createdAt);
+    
+    
+    
+    @Query("SELECT AVG(sd.qssoGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalqssoGrowthAll(@Param("createdAt") Date createdAt);
+    
+    @Query("SELECT AVG(sd.qssoMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalqssoMtdAll(@Param("createdAt") Date createdAt);
+    
+    @Query("SELECT AVG(sd.qssoLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
+    BigDecimal findTotalqssoLmtdAll(@Param("createdAt") Date createdAt);
+    
+    
+    
+    
+    
+    
+    
     
     @Query("SELECT AVG(sd.moboMtd) FROM SalesData sd")
     BigDecimal findTotalmoboMtdAll();
@@ -153,18 +200,34 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     @Query("SELECT AVG(sd.dailySsoGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt")
     BigDecimal findTotaldailySsoGrowth(@Param("createdAt") Date createdAt);
 
-    @Query("SELECT AVG(sd.quroGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalquroGrowth(@Param("createdAt") Date createdAt);
+//    @Query("SELECT AVG(sd.vlrGrowth) * 100 FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+//    BigDecimal findTotalVlrGrowth(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+    
+    
+    @Query("SELECT AVG(sd.quroLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalquroLmtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+    
+    @Query("SELECT AVG(sd.quroGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalquroGrowth(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.quroMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalquroMtd(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.quroMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalquroMtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.qssoGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalqssoGrowth(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.qssoGrowth) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalqssoGrowth(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
-    @Query("SELECT AVG(sd.qssoMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
-    BigDecimal findTotalqssoMtd(@Param("createdAt") Date createdAt);
+    @Query("SELECT AVG(sd.qssoMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalqssoMtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
+    
+    @Query("SELECT AVG(sd.qssoLmtd) FROM SalesData sd WHERE sd.createdAt = :createdAt AND sd.salesArea = :salesArea")
+    BigDecimal findTotalqssoLmtd(@Param("createdAt") Date createdAt,@Param("salesArea") String salesArea);
 
+    
+    
+    
+    
+    
+    
     @Query("SELECT AVG(sd.moboMtd) FROM SalesData sd WHERE sd.createdAt = :createdAt")
     BigDecimal findTotalmoboMtd(@Param("createdAt") Date createdAt);
 
@@ -259,6 +322,8 @@ public interface SalesDataRepository extends JpaRepository<SalesData, Long> {
     // Query to fetch distinct 'created_at' values
     @Query("SELECT DISTINCT sd.createdAt FROM SalesData sd ORDER BY sd.createdAt DESC")
     List<Date>findDistinctCreatedAt();
+    
+
 
     @Modifying
     @Transactional
